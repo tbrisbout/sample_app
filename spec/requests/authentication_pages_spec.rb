@@ -36,6 +36,13 @@ describe "Authentication" do
       it { should have_link('Settings',    href: edit_user_path(user)) }
       it { should have_link('Sign out',    href: signout_path) }
       it { should_not have_link('Sign in', href: signin_path) }
+    
+      describe "when not signed in" do 
+        before { click_link "Sign out"}
+        it { should_not have_link('Profile',     href: user_path(user)) }
+        it { should_not have_link('Settings',    href: edit_user_path(user)) }
+        it { should_not have_link('Sign out',    href: signout_path) }
+      end
     end
   end
 
@@ -56,6 +63,20 @@ describe "Authentication" do
 
           it "should render the desired protected page" do
             expect(page).to have_title('Edit user')
+          end
+        end
+
+        describe "when signing in again" do
+          before do
+            delete signout_path
+            visit signin_path
+            fill_in "Email",    with: user.email
+            fill_in "Password", with: user.password
+            click_button "Sign in"
+          end
+
+          it "should render the default (profile) page" do
+            expect(page).to have_title(user.name)
           end
         end
       end
@@ -107,5 +128,30 @@ describe "Authentication" do
         specify { expect(response).to redirect_to(root_url) }
       end
     end
+
+    describe "as admin user" do
+      let(:admin) { FactoryGirl.create(:admin) }
+      before { sign_in admin, no_capybara: true }
+
+      describe "submitting a DELETE request to the Users#destroy action" do
+        before { delete user_path(admin) }
+        specify { expect(admin.reload).not_to be_nil }
+      end
+    end
+
+    describe "as signed-in user" do 
+      let(:user) { FactoryGirl.create(:user) }
+      before { sign_in user, no_capybara: true }
+
+      describe "submitting a GET request to the Users#new action" do
+        before { get new_user_path}
+        specify { expect(response).to redirect_to(root_url) }
+      end
+
+      describe "submitting a POST request to the Users#create action" do
+        before { post users_path}
+        specify { expect(response).to redirect_to(root_url) }
+      end
+    end    
   end
 end
