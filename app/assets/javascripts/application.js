@@ -19,10 +19,12 @@
 $(function() { 
   $("#micropost_content").on('keyup', function() {
     var micropost = $(this).val(),
-        parentDiv = $(this).parent();
+        parentDiv = $(this).parent()
+        countdown = (140 - micropost.length),
+        message = countdown > 0 ? countdown + " remaining characters" : "micropost is too long";
 
     parentDiv.children('p').remove();
-    parentDiv.append('<p>' + (140 - micropost.length) + ' remaining characters</p>');
+    parentDiv.append('<p>' + message + '</p>');
   });
 });
 
