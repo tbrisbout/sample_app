@@ -31,6 +31,16 @@ describe "Static pages" do
           expect(page).to have_selector("li##{item.id}", text: item.content)
         end
       end
+
+      it { should have_content("micropost".pluralize(user.microposts.count)) }
+
+      describe "pagination" do 
+        before do
+          50.times { FactoryGirl.create(:micropost, user: user, content: "Dummy Content") }
+          visit root_path
+        end
+        it { should have_selector('div.pagination') }
+      end
     end
   end
 
