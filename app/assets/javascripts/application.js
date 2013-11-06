@@ -15,3 +15,14 @@
 //= require bootstrap
 //= require turbolinks
 //= require_tree .
+
+$(function() { 
+  $("#micropost_content").on('keyup', function() {
+    var micropost = $(this).val(),
+        parentDiv = $(this).parent();
+
+    parentDiv.children('p').remove();
+    parentDiv.append('<p>' + (140 - micropost.length) + ' remaining characters</p>');
+  });
+});
+
